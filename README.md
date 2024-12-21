@@ -71,8 +71,12 @@ python manage.py runserver
 1. หน้าเว็บไซต์หลัก: http://127.0.0.1:8000/
    - จะเห็นหน้า Welcome to Django
 
+   <img src="https://drive.google.com/uc?export=view&id=1octX1nGpWDM7f0B-qnP-LMdivX9BYETO" alt="Django Welcome Page" width="600"/>
+
 2. หน้า Admin: http://127.0.0.1:8000/admin
    - เข้าสู่ระบบด้วย superuser ที่สร้างไว้
+
+   <img src="https://drive.google.com/uc?export=view&id=1pvaIfz9N1N9P7FlZdsdi2SJTBik__k-f" alt="Django Admin Login" width="600"/>
 
 ## หมายเหตุสำคัญ
 - ต้องเปิด virtual environment ทุกครั้งก่อนรันโปรเจค
