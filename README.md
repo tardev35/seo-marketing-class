@@ -1,4 +1,4 @@
-# Session 3: Django Models, Views และการดึงข้อมูล
+# Session 3: Image Upload, Database Query (Blog List and Detal), Template Inheritance, SEO Meta Tags
 
 ## โครงสร้างการทำงาน
 ```
