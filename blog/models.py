@@ -14,7 +14,6 @@ class Post(models.Model):
     date_updated = models.DateTimeField(auto_now=True)
 
 
-# blog/templates/blog/home.html
 
 
 
