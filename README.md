@@ -1,115 +1,177 @@
-# Session 2: Django Models, Views และ Templates
+# Session 3: Django Models, Views และการดึงข้อมูล
 
 ## โครงสร้างการทำงาน
 ```
-mysite/                # โปรเจคหลัก 
-├── blog/              # แอปพลิเคชัน blog
-│   ├── models.py      # กำหนดโครงสร้างฐานข้อมูล
-│   ├── views.py       # ลอจิคการทำงาน
+mysite/
+├── blog/
+│   ├── models.py      # กำหนดโครงสร้างข้อมูล
+│   ├── views.py       # ตรรกะการดึงข้อมูล
 │   ├── urls.py        # กำหนด URL patterns
-│   ├── admin.py       # Register models ใน admin
 │   └── templates/     # โฟลเดอร์เก็บไฟล์ HTML
-│       └── blog/
-│           └── home.html
-└── mysite/            # ตัวเว็บไซต์หลัก
-    ├── settings.py    # ตั้งค่าโปรเจค
-    └── urls.py        # URL หลักของเว็บไซต์
+│       └── blog/           
+│           ├── base.html (ไฟล์แม่ ใช้สืบทอด template)
+│           ├── home.html
+│           └── post_detail.html
+└── media/            # โฟลเดอร์เก็บรูปภาพ
+    └── blog_images/  # รูปภาพจาก featured_image
 ```
 
-## 1. การสร้าง Model
-ใน `blog/models.py`:
+## 1. การดึงข้อมูลจากฐานข้อมูล (Blog List & Detail)
+
+### โมเดล Post
 ```python
+# models.py
 from django.db import models
 
 class Post(models.Model):
     title = models.CharField(max_length=100)
     description = models.CharField(max_length=200)
     body = models.TextField()
+    featured_image = models.ImageField(
+        upload_to='blog_images/',
+        null=True,
+        blank=True
+    )
     date_created = models.DateTimeField(auto_now_add=True)
     date_updated = models.DateTimeField(auto_now=True)
 ```
 
-## 2. ลงทะเบียน Model ใน Admin
-ใน `blog/admin.py`:
+### Views สำหรับแสดงข้อมูล
 ```python
-from django.contrib import admin 
-from .models import Post 
-
-admin.site.register(Post)
-```
-
-## 3. สร้าง View
-ใน `blog/views.py`:
-```python
-from django.shortcuts import render
-from django.http import HttpResponse
+# views.py
+from django.shortcuts import render, get_object_or_404
+from .models import Post
 
 def home(request):
-    return render(request, 'blog/home.html')
+    all_posts = Post.objects.all()
+    context = {
+        'all_posts': all_posts
+    }
+    return render(request, 'blog/home.html', context)
+
+def post_detail(request, post_id):
+    single_post = get_object_or_404(Post, id=post_id)
+    context = {
+        'single_post': single_post
+    }
+    return render(request, 'blog/post_detail.html', context)
 ```
 
-## 4. กำหนด URLs
-ใน `blog/urls.py`:
+### URLs Configuration
 ```python
-from django.urls import path 
-from .views import home 
+# urls.py
+from django.urls import path
+from .views import home, post_detail
 
 urlpatterns = [
     path('', home),
+    path('blog/<int:post_id>/', post_detail)
 ]
 ```
 
-ใน `mysite/urls.py`:
+## 2. การแสดงผลข้อมูลใน Template
+
+### หน้าแรก (Home Page)
+```html
+{% extends 'blog/base.html' %}
+{% block meta %}
+<title>SCFS - จำหน่ายอาหารแมวทุกประเภท จัดส่งฟรีทั่วประเทศ</title>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Hero Section -->
+    <div class="bg-light text-dark py-5 mb-5">
+        <!-- Hero content -->
+    </div>
+
+    <h2>Blog</h2>
+    <div class="row">
+        {% for post in all_posts %}
+        <div class="col-sm-4">
+            <div class="card">
+                <div class="card-body">
+                    <img src="{{ post.featured_image.url }}" 
+                         class="card-img-top" 
+                         alt="{{ post.title }}">
+                    <h5 class="card-title">{{ post.title }}</h5>
+                    <p class="card-text">{{ post.description }}</p>
+                    <a href="/blog/{{ post.id }}" 
+                       class="btn btn-primary">อ่านเพิ่มเติม</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+```
+
+### หน้ารายละเอียดบทความ (Post Detail)
+```html
+{% extends 'blog/base.html' %}
+{% block meta %}
+<title>{{ single_post.title }}</title>
+<meta name="description" content="{{ single_post.description }}">
+<link rel="canonical" href="{{ single_post.get_absolute_url }}">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="col-sm-8">
+        <h1>{{ single_post.title }}</h1>
+        <p>{{ single_post.description }}</p>
+        <img src="{{ single_post.featured_image.url }}" 
+             class="img-fluid" 
+             alt="{{ single_post.title }}">
+    </div>
+</div>
+{% endblock %}
+```
+
+## 3. การจัดการรูปภาพ (Image Upload)
+
+### ตั้งค่าใน settings.py
 ```python
-from django.contrib import admin
-from django.urls import path, include
+# settings.py
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+```
+
+### เพิ่ม URL patterns สำหรับไฟล์ media
+```python
+# urls.py (หลัก)
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
-    path('', include('blog.urls')),
-    path('admin/', admin.site.urls),
-]
+    # URL patterns อื่นๆ
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 ```
 
-## 5. ลงทะเบียน App
-ใน `mysite/settings.py`:
-```python
-INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'blog'  # เพิ่ม app blog
-]
-```
+## 4. การเพิ่ม Meta Tags และ Social Share
 
-## 6. สร้าง Template
-สร้างไฟล์ `blog/templates/blog/home.html`:
+### Facebook Open Graph
 ```html
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>Sonny shopping web</title>
-        <!-- Bootstrap CSS -->
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    </head>
-    <body>
-        <!-- Navbar และ Content -->
-        <div class="container">
-            <h1>Welcome to the Blog</h1>
-            <!-- เนื้อหาเว็บไซต์ -->
-        </div>
-    </body>
-</html>
+<meta property="og:title" content="{{ single_post.title }}">
+<meta property="og:description" content="{{ single_post.description }}">
+<meta property="og:image" content="{{ single_post.featured_image.url }}">
+<meta property="og:url" content="{{ request.build_absolute_uri }}">
 ```
 
-## ขั้นตอนการรันโปรเจค
+### Twitter Cards
+```html
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{ single_post.title }}">
+<meta name="twitter:description" content="{{ single_post.description }}">
+<meta name="twitter:image" content="{{ single_post.featured_image.url }}">
+```
 
-1. อัพเดทฐานข้อมูล:
+## การรันโปรเจค
+1. ตรวจสอบว่าอยู่ใน virtual environment:
 ```bash
-python manage.py makemigrations
-python manage.py migrate
+source env/bin/activate  # สำหรับ Mac/Linux
+env\Scripts\activate    # สำหรับ Windows
 ```
 
 2. รันเซิร์ฟเวอร์:
@@ -117,13 +179,8 @@ python manage.py migrate
 python manage.py runserver
 ```
 
-3. เข้าใช้งานเว็บไซต์:
-- หน้าหลัก: http://127.0.0.1:8000/
-- หน้า Admin: http://127.0.0.1:8000/admin
-
-## โครงสร้างข้อมูล Post
-- title: ชื่อบทความ (ความยาวไม่เกิน 100 ตัวอักษร)
-- description: คำอธิบายสั้นๆ (ความยาวไม่เกิน 200 ตัวอักษร)
-- body: เนื้อหาบทความ
-- date_created: วันที่สร้าง (บันทึกอัตโนมัติ)
-- date_updated: วันที่อัพเดท (อัพเดทอัตโนมัติ)
+## หมายเหตุ
+- ต้องติดตั้ง Pillow สำหรับจัดการรูปภาพ: `pip install Pillow`
+- ควรสร้างโฟลเดอร์ media/ ก่อนอัพโหลดรูปภาพ
+- รูปภาพที่อัพโหลดควรมีขนาดที่เหมาะสมเพื่อประสิทธิภาพ
+- ควรใส่ alt text ให้รูปภาพเสมอสำหรับ SEO
