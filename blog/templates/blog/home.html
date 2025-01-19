@@ -24,6 +24,44 @@
       </div>
   </div>
 </div>
+
+<section>
+  <h2>อาหารแมว แยกตามหมวดหมู่</h2>
+  <div class="row">  
+    {% for category in categories %}   
+      <div class="col-sm-4">
+        <div class="card">
+          <div class="card-body">
+            <img src="{{ category.image.url }}" class="card-img-top" alt="{{ category.name }}">
+            <h5 class="card-title">{{ category.name }}</h5>
+            <p class="card-text">{{ category.description }}</p>
+            <a href="/products/{{ product.id }}" class="btn btn-primary">อ่านเพิ่มเติม</a>
+          </div>
+        </div>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+
+<section>
+  <h2>สินค้ายอดนิยม</h2>
+  <div class="row">  
+    {% for product in products %}   
+      <div class="col-sm-4">
+        <div class="card">
+          <div class="card-body">
+            <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.title }}">
+            <h5 class="card-title">{{ product.title }}</h5>
+            <p class="card-text">{{ product.description }}</p>
+            <a href="/products/{{ product.id }}" class="btn btn-primary">อ่านเพิ่มเติม</a>
+          </div>
+        </div>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+
+<section>
   <h2>Blog</h2>
   <div class="row">  
     {% for post in all_posts %}   
@@ -39,6 +77,8 @@
     </div>
     {% endfor %}
   </div>
+</section>
+
 </div>
 {% endblock %}
 
