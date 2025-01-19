@@ -3,9 +3,8 @@ from .views import home, post_detail
 
 
 urlpatterns = [
-    path('', home),
-    path('blog/<int:post_id>/', post_detail) 
+    path('', home, name="home"),
+    path('blog/<slug:slug>/', post_detail, name="post_detail") 
 ]
-
 
 

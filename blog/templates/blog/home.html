@@ -24,21 +24,66 @@
       </div>
   </div>
 </div>
-  <h2>Blog</h2>
+
+<section>
+  <h2>อาหารแมว แยกตามหมวดหมู่</h2>
+  <div class="row">  
+    {% for category in categories %}   
+      <div class="col-sm-4">
+        <div class="card">
+          <div class="card-body">
+            <img src="{{ category.image.url }}" class="card-img-top" alt="{{ category.name }}">
+            <h5 class="card-title">{{ category.name }}</h5>
+            <p class="card-text">{{ category.description }}</p>
+            <div class="d-flex justify-content-center">
+              <a href="{{ category.get_absolute_url }}" class="btn btn-outline-primary">อ่านเพิ่มเติม</a>
+            </div>
+          </div>
+        </div>
+    </div>
+    {% endfor %}
+  </div><br><br>
+</section>
+
+<section>
+  <h2>สินค้ายอดนิยม</h2>
+  <div class="row">  
+    {% for product in products %}   
+      <div class="col-sm-3">
+        <div class="card">
+          <div class="card-body">
+            <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.title }}">
+            <h5 class="card-title">{{ product.title }}</h5>
+            <p class="card-text">{{ product.description }}</p>
+            <div class="d-flex justify-content-center">
+              <a href="{{ product.get_absolute_url }}" class="btn btn-primary">อ่านเพิ่มเติม</a>
+            </div>
+          </div>
+        </div>
+    </div>
+    {% endfor %}
+  </div><br><br>
+</section>
+
+<section>
+  <h2>บทความล่าสุด</h2>
   <div class="row">  
     {% for post in all_posts %}   
       <div class="col-sm-4">
         <div class="card">
           <div class="card-body">
-            <img src="{{ post.featured_image.url }}" class="card-img-top" alt="{{ post.title }}">
             <h5 class="card-title">{{ post.title }}</h5>
             <p class="card-text">{{ post.description }}</p>
-            <a href="/blog/{{ post.id }}" class="btn btn-primary">อ่านเพิ่มเติม</a>
+            <div class="d-flex justify-content-center">
+              <a href="{{ post.get_absolute_url }}" class="btn btn-outline-dark">อ่านเพิ่มเติม</a>
+            </div>
           </div>
         </div>
     </div>
     {% endfor %}
   </div>
+</section>
+
 </div>
 {% endblock %}
 
