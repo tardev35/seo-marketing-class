@@ -2,10 +2,40 @@
 
 {% block meta %}
 <title>{{ product.name }} | SCFS</title>
+<!-- products/product_detail.html -->
+<script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Product",
+      "name": "{{ product.name }}",
+      "description": "{{ product.description }}",
+      "image": "{{ product.image.url }}",
+      "brand": {
+        "@type": "Brand",
+        "name": "SCFS"
+      },
+      "offers": {
+        "@type": "Offer",
+        "price": "{{ product.price }}",
+        "priceCurrency": "THB",
+        "availability": "{% if product.stock > 0 %}https://schema.org/InStock{% else %}https://schema.org/OutOfStock{% endif %}"
+      },
+      "category": "{{ product.category.name }}"
+    }
+</script>
+
 {% endblock %}
 
 {% block content %}
 <div class="container">
+    <br>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="/">Home</a></li>
+          <li class="breadcrumb-item"><a href="{{ product.category.get_absolute_url }}">{{ product.category.name }}</a></li>
+          <li class="breadcrumb-item active" aria-current="page">{{ product.name }}</li>
+        </ol>
+    </nav>
     <div class="row">
         <div class="col-md-6">
             {% if product.image %}
@@ -27,6 +57,44 @@
             <p class="text-danger">สินค้าหมด</p>
             {% endif %}
         </div>
+
+        <!-- Product detail -->
+        <div class="col-md-6">
+            <br>
+            {{ product.body | safe }}
+        </div>
+
+        <!-- Related Products Section products/product_detail.html -->
+        {% if related_products %}
+        <div class="row mt-5">
+            <div class="col-md-12">
+                <h3>สินค้าที่เกี่ยวข้อง</h3>
+                <div class="row">
+                    {% for related_product in related_products %}
+                    <div class="col-md-3">
+                        <div class="card mb-4">
+                            <a href="{{ related_product.get_absolute_url }}">
+                                {% if related_product.image %}
+                                <img src="{{ related_product.image.url }}" class="card-img-top" alt="{{ related_product.name }}">
+                                {% endif %}
+                            </a>
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    <a href="{{ related_product.get_absolute_url }}">{{ related_product.name }}</a>
+                                </h5>
+                                <p class="card-text">฿{{ related_product.price }}</p>
+                                <a href="{{ related_product.get_absolute_url }}" class="btn btn-primary">ดูรายละเอียด</a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+
+
     </div>
 </div>
 {% endblock %}

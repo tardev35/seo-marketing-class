@@ -13,9 +13,10 @@
   <div class="col-sm-8">  
     <h1>{{ single_post.title }}</h1>
     <p>{{ single_post.description }}</p>
+    <p>อัปเดตล่าสุด: {{ single_post.date_updated | date }}</p>
     <img src="{{ single_post.featured_image.url }}" class="card-img-top" alt="{{ single_post.title }}">
     <br><br>
-    <p>{{ single_post.body }}</p>
+    <p>{{ single_post.body | safe }}</p>
   </div>
 </div>
 {% endblock %}

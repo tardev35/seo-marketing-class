@@ -29,7 +29,8 @@ INSTALLED_APPS = [
     'django.contrib.sitemaps',
     'django.contrib.sites',
     'blog',
-    'products'
+    'products',
+    'django_summernote'
 ]
 
 SITE_ID = 1
