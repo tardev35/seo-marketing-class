@@ -1,0 +1,2 @@
+1. pip install django-summernote
+2. สร้าง superuser
