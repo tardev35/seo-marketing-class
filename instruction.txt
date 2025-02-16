@@ -1,2 +1,3 @@
 1. pip install django-summernote
 2. สร้าง superuser
+certbot --nginx -d catsfood.my -d www.catsfood.my
